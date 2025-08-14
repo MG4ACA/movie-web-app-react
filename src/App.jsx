@@ -21,12 +21,15 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (query = "") => {
     setIsLoading(true);
     setErrorMessage("");
     try {
+      console.log("Fetching movies...", query);
       const response = await fetch(
-        `${BASE_URL}/discover/movie?sort_by=popularity.desc`,
+        query
+          ? `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+          : `${BASE_URL}/discover/movie?sort_by=popularity.desc`,
         API_OPTIONS
       );
       if (!response.ok) {
@@ -48,8 +51,8 @@ function App() {
   };
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    fetchMovies(searchTerm);
+  }, [searchTerm]);
 
   return (
     <main className="pt-[2rem] bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
