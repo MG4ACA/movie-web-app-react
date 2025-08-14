@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import Card from "./components/Card";
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 
@@ -51,7 +52,7 @@ function App() {
   }, []);
 
   return (
-    <main>
+    <main className="pt-[2rem] bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
       <div className="pattern" />
 
       <div className="wrapper pt-px">
@@ -70,11 +71,9 @@ function App() {
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
           ) : (
-            <div>
+            <div className="flex flex-wrap justify-between">
               {moviesList.map((movie) => (
-                <li key={movie.id} className="text-white">
-                  {movie.title}
-                </li>
+                <Card key={movie.id} props={movie} />
               ))}
             </div>
           )}
