@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Search from "./components/Search";
+import Spinner from "./components/Spinner";
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -53,30 +54,31 @@ function App() {
     <main>
       <div className="pattern" />
 
-      <div className="wrapper">
-        <header>
+      <div className="wrapper pt-px">
+        <header className="mt-px">
           <img src="./hero-banner.png" alt="Here banner" />
           <h1 className="text-5xl font-bold">
             Find <span className="text-gradient"> Movies</span> You'll Enjoy Without the Hassle
           </h1>
+          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
-        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-
-        <h1>All Movies</h1>
-        {isLoading ? (
-          <p className="text-white">Loading...</p>
-        ) : errorMessage ? (
-          <p className="text-red-500">{errorMessage}</p>
-        ) : (
-          <ul>
-            {moviesList.map((movie) => (
-              <li key={movie.id} className="text-white">
-                {movie.title}
-              </li>
-            ))}
-          </ul>
-        )}
+        <section className="all-movies">
+          <h1 className="text-4xl flex justify-start">All Movies</h1>
+          {isLoading ? (
+            <Spinner />
+          ) : errorMessage ? (
+            <p className="text-red-500">{errorMessage}</p>
+          ) : (
+            <div>
+              {moviesList.map((movie) => (
+                <li key={movie.id} className="text-white">
+                  {movie.title}
+                </li>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
