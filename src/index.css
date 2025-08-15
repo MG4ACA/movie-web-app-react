@@ -44,13 +44,13 @@
   }
 
   header img {
-    @apply w-full max-w-lg h-auto object-contain mx-auto drop-shadow-md;
+    @apply w-xs max-w-lg h-auto object-contain mx-auto drop-shadow-md;
   }
 }
 
 @layer components {
   .pattern {
-    @apply bg-hero-pattern w-screen h-screen bg-center bg-cover absolute z-0;
+    @apply bg-hero-pattern w-screen  bg-center bg-cover absolute z-0;
   }
 
   .wrapper {
@@ -65,7 +65,7 @@
     }
 
     & ul li {
-      @apply min-w-[230px] flex flex-row items-center;
+      @apply flex flex-row items-center;
     }
 
     & ul li p {
@@ -73,7 +73,7 @@
     }
 
     & ul li img {
-      @apply w-[127px] h-[163px] rounded-lg object-cover -ml-3.5;
+      @apply h-[163px] rounded-lg object-cover -ml-3.5;
     }
   }
 

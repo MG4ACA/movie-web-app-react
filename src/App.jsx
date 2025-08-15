@@ -1,13 +1,136 @@
-import './App.css'
+import { useEffect, useState } from "react";
+import { useDebounce } from "react-use";
+import "./App.css";
+import { getTrendingMovies, updateSearchCount } from "./appwrite";
+import Card from "./components/Card";
+import Search from "./components/Search";
+import Spinner from "./components/Spinner";
+
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BASE_URL = "https://api.themoviedb.org/3";
+
+const API_OPTIONS = {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${API_KEY}`,
+  },
+};
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [moviesList, setMoviesList] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [trendingMovies, setTrendingMovies] = useState([]);
+
+  useDebounce(
+    () => {
+      setDebouncedSearchTerm(searchTerm);
+    },
+    500,
+    [searchTerm]
+  );
+
+  const fetchMovies = async (query = "") => {
+    setIsLoading(true);
+    setErrorMessage("");
+    try {
+      console.log("Fetching movies...", query);
+      const response = await fetch(
+        query
+          ? `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
+          : `${BASE_URL}/discover/movie?sort_by=popularity.desc`,
+        API_OPTIONS
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      if (data.Response === "False") {
+        setErrorMessage(data.Error);
+        setMoviesList([]);
+        return;
+      }
+      await setMoviesList(data.results || []);
+
+      if (query && data.results.length > 0) {
+        await updateSearchCount(query, data.results[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+      setErrorMessage("Failed to fetch movies");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchTrendingMovies = async () => {
+    try {
+      setIsLoading(true);
+
+      const result = await getTrendingMovies();
+      setTrendingMovies(result);
+    } catch (error) {
+      console.error("Error fetching trending movies:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMovies(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    fetchTrendingMovies();
+  }, []);
+
   return (
-      <>
-          <h1 className="text-3xl font-bold underline">
-              Hello There!
+    <main className="pt-[2rem] bg-white dark:bg-gray-900 bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] dark:bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern-dark.svg')]">
+      <div className="pattern" />
+
+      <div className="wrapper pt-px">
+        <header className="mt-px">
+          <img src="./hero-banner.png" alt="Here banner" />
+          <h1 className="text-5xl font-bold">
+            Find <span className="text-gradient"> Movies</span> You'll Enjoy Without the Hassle
           </h1>
-      </>
-  )
+          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </header>
+
+        {trendingMovies.length > 0 && (
+          <section className="trending">
+            <h2 className="text-2xl font-bold">Trending Movies</h2>
+            <ul className="flex flex-wrap justify-between">
+              {trendingMovies.map((movie, index) => (
+                <li key={movie.$id}>
+                  <p>{index + 1}</p>
+                  <img src={movie.poster_url} alt={movie.title} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section className="all-movies">
+          <h1 className="text-4xl flex justify-start">All Movies</h1>
+          {isLoading ? (
+            <Spinner />
+          ) : errorMessage ? (
+            <p className="text-red-500">{errorMessage}</p>
+          ) : (
+            <div className="flex flex-wrap justify-between">
+              {moviesList.map((movie) => (
+                <Card key={movie.$id} props={movie} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }
 
-export default App
+export default App;
