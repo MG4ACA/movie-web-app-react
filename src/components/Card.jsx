@@ -11,7 +11,7 @@ const Card = ({ key, props }) => {
 
       <div className="flex items-center m-[0.5rem]">
         <svg
-          class="w-6 h-6 text-gray-800 dark:text-yellow-300 mr-[0.5rem]"
+          className="w-6 h-6 text-gray-800 dark:text-yellow-300 mr-[0.5rem]"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
