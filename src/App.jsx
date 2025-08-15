@@ -68,10 +68,14 @@ function App() {
 
   const fetchTrendingMovies = async () => {
     try {
+      setIsLoading(true);
+
       const result = await getTrendingMovies();
       setTrendingMovies(result);
     } catch (error) {
       console.error("Error fetching trending movies:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
